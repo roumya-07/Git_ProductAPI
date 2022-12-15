@@ -1,8 +1,167 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Index";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<h1>Index</h1>
+
+<div class="row">
+    <div class="col-md-4 btn btn-secondary">
+
+        <div class="form-group">
+            <input type="hidden" id="productid" class="form-control" />
+        </div>
+        <div class="form-group">
+            Enter Product Name:
+            <input id="productname" class="form-control" />
+        </div>
+        <div class="form-group">
+            Enter Product Description:
+            <input id="productdesc" class="form-control" />
+        </div>
+        <div class="form-group">
+            Select Category
+            <select asp="catid" id="catid" asp-items="@(new SelectList( ViewBag.Category,"catid","catdesc"))" class="form-control">
+            </select>
+        </div>
+        <div class="form-group">
+            Select Subcategory
+            <select asp="subcatid" id="subcatid" class="form-control">
+            </select>
+        </div>
+        <div class="form-group">
+            Enter Price:
+            <input id="productprice" class="form-control" />
+        </div>
+        <div class="form-group">
+            Enter Quantity:
+            <input id="productqty" class="form-control" />
+        </div>
+        <div class="form-group">
+            Enter Photo:
+            <input type="file" id="productimage" class="form-control" />
+        </div>
+        <div class="form-group">
+            <input type="button" id="saveupdate" value="Save" class="btn btn-primary" />
+        </div>
+
+    </div>
 </div>
+<table class="table" id="table_product">
+    <thead>
+        <tr>
+            <th>
+                Product ID
+            </th>
+            <th>
+                Product Name
+            </th>
+            <th>
+                Product Description
+            </th>
+            <th>
+                Category Name
+            </th>
+            <th>
+                Subcategory Name
+            </th>
+            <th>
+                Product Price
+            </th>
+            <th>
+                Product Quantity
+            </th>
+            <th>
+                Product Photo
+            </th>
+            <th>
+                Action
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script type="text/javascript">
+    $(window).on("load", function () {
+        GetAllProducts();
+    });
+
+    $(document).ready(function () {
+        $("#catid").change(function () {
+            var id = $(this).val();
+            $("#subcatid").empty();
+
+            $.getJSON("/Home/SubCat_Bind", { catid: id }, function (data) {
+                data = JSON.parse(data);
+                var v = "<option>Select One</option>";
+                $.each(data, function (i, v1) {
+                    v += "<option value=" + v1.Value + ">" + v1.Text + "</option>";
+                });
+                $("#subcatid").html(v);
+            });
+        });
+    })
+
+    $("#saveupdate").click(function () {
+        var prod = { productid: $("#productid").val(), productname: $("#productname").val(), productdesc: $("#productdesc").val(), catid: $("#catid").val(), subcatid: $("#subcatid").val(), productprice: $("#productprice").val(), productqty: $("#productqty").val(), productimage: $("#productimage").val()  };
+        $.post("/Home/Create", prod, function () {
+            if (prod.pid == 0) {
+                alert("Data Inserted")
+                location.reload();
+            }
+            else {
+                alert("Data Updated")
+                location.reload();
+            }
+            GetAllProducts();
+        });
+    });
+
+    function GetAllProducts() {
+        $("#table_product tbody tr").remove();
+
+        $.getJSON("/Home/GetProducts", function (data) {
+            data = JSON.parse(data);
+            $.each(data, function (i, prod) {
+                $("#table_product tbody").append(
+                    `<tr><td>` + prod.productid + `</td><td>` + prod.productname + `</td><td>` + prod.productdesc + `</td><td>` + prod.catdesc + `</td><td>` + prod.subcatdesc + `</td><td>` + prod.productprice + `</td><td>` + prod.productqty + `</td><td>` + prod.productimage + `</td><td><button class="btn btn-primary" onclick="Edit(` + prod.pid + `)">Edit</button>&nbsp;&nbsp;<button class="btn btn-primary" onclick="Delete(` + prod.pid + `)">Delete</button></td></tr>>`
+                );
+            });
+        });
+    }
+
+    function Edit(pid) {
+        $.getJSON("/Home/Edit", { pid: pid }, function (data) {
+            prod = JSON.parse(data);
+            $("#productid").val(prod.productid);
+            $("#catid").val(prod.catid);
+            $("#subcatid").empty();
+            $.getJSON("Home/SubCat_Bind", { catid: prod.catid }, function (data) {
+                data = JSON.parse(data);
+                $.each(data, function (i, subcatid) {
+                    $("#subcatid").append(
+                        `<option value=` + subcatid.Value + `>` + subcatid.Text + `</option>`
+                    );
+                    $("#subcatid").val(prod.subcatid);
+                });
+            });
+            $("#productname").val(prod.productname);
+            $("#productdesc").val(prod.productdesc);
+            $("#catid").val(prod.catid);
+            $("#subcatid").val(prod.subcatid);
+            $("#productprice").val(prod.productprice);
+            $("#productqty").val(prod.productqty);
+            $("#productimage").val(prod.productimage);
+        });
+    }
+
+    function Delete(pid) {
+        $.post("Home/Delete", { pid: pid }, function () {
+            alert("Data Deleted");
+            GetAllProducts();
+        });
+    }
+</script>

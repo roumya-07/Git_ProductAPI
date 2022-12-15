@@ -1,3 +1,5 @@
+using Git_ProductAPI.Repository;
+using Git_ProductAPI.Service;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -25,6 +27,9 @@ namespace Git_ProductAPI
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+            services.AddScoped<IProdReprository, ProdReprository>();
+            services.AddScoped<IProdService, ProdService>();
+            services.AddSwaggerGen();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -37,7 +42,10 @@ namespace Git_ProductAPI
 
             app.UseRouting();
 
+
             app.UseAuthorization();
+            app.UseSwagger();
+            app.UseSwaggerUI();
 
             app.UseEndpoints(endpoints =>
             {
