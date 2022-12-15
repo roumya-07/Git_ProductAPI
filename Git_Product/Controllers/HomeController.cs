@@ -76,10 +76,10 @@ namespace Git_Product.Controllers
             var jsonres = JsonConvert.SerializeObject(scalist);
             return Json(jsonres);
         }
-        public async Task<JsonResult> Edit(int pid)
+        public async Task<JsonResult> Edit(int productid)
         {
             Product productlist = new Product();
-            HttpResponseMessage response = client.GetAsync(client.BaseAddress + "/Product/" + pid).Result;
+            HttpResponseMessage response = client.GetAsync(client.BaseAddress + "/Product/" + productid).Result;
             if (response.IsSuccessStatusCode)
             {
                 string data = response.Content.ReadAsStringAsync().Result;
@@ -88,10 +88,10 @@ namespace Git_Product.Controllers
             var jsonres = JsonConvert.SerializeObject(productlist);
             return Json(jsonres);
         }
-        public int Delete(int pid)
+        public int Delete(int productid)
         {
             Product productlist = new Product();
-            HttpResponseMessage response = client.DeleteAsync(client.BaseAddress + "/Product/" + pid).Result;
+            HttpResponseMessage response = client.DeleteAsync(client.BaseAddress + "/Product/" + productid).Result;
             if (response.IsSuccessStatusCode)
             {
                 return 1;

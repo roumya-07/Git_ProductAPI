@@ -14,9 +14,9 @@ namespace Git_ProductAPI.Service
         {
             _prodrepo = prodrepo;
         }
-        public async Task<int> Delete(int pid)
+        public async Task<int> Delete(int productid)
         {
-            return await _prodrepo.Delete(pid);
+            return await _prodrepo.Delete(productid);
         }
 
         public async Task<List<Category>> GetAllCategory()

@@ -61,15 +61,15 @@ namespace Git_ProductAPI.Controllers
                 }
             }
         }
-        [HttpDelete("{id}")]
-        public async Task<ActionResult<Product>> DeleteProduct(int id)
+        [HttpDelete("{productid}")]
+        public async Task<ActionResult<Product>> DeleteProduct(int productid)
         {
-            var prod = await _prodservice.GetProductById(id);
+            var prod = await _prodservice.GetProductById(productid);
             if (prod == null)
             {
                 return NotFound();
             }
-            await _prodservice.Delete(id);
+            await _prodservice.Delete(productid);
             return prod;
         }
     }

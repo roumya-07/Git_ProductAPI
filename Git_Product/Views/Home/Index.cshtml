@@ -108,7 +108,7 @@
     $("#saveupdate").click(function () {
         var prod = { productid: $("#productid").val(), productname: $("#productname").val(), productdesc: $("#productdesc").val(), catid: $("#catid").val(), subcatid: $("#subcatid").val(), productprice: $("#productprice").val(), productqty: $("#productqty").val(), productimage: $("#productimage").val()  };
         $.post("/Home/Create", prod, function () {
-            if (prod.pid == 0) {
+            if (prod.productid == 0) {
                 alert("Data Inserted")
                 location.reload();
             }
@@ -127,14 +127,14 @@
             data = JSON.parse(data);
             $.each(data, function (i, prod) {
                 $("#table_product tbody").append(
-                    `<tr><td>` + prod.productid + `</td><td>` + prod.productname + `</td><td>` + prod.productdesc + `</td><td>` + prod.catdesc + `</td><td>` + prod.subcatdesc + `</td><td>` + prod.productprice + `</td><td>` + prod.productqty + `</td><td>` + prod.productimage + `</td><td><button class="btn btn-primary" onclick="Edit(` + prod.pid + `)">Edit</button>&nbsp;&nbsp;<button class="btn btn-primary" onclick="Delete(` + prod.pid + `)">Delete</button></td></tr>>`
+                    `<tr><td>` + prod.productid + `</td><td>` + prod.productname + `</td><td>` + prod.productdesc + `</td><td>` + prod.catdesc + `</td><td>` + prod.subcatdesc + `</td><td>` + prod.productprice + `</td><td>` + prod.productqty + `</td><td>` + prod.productimage + `</td><td><button class="btn btn-primary" onclick="Edit(` + prod.productid + `)">Edit</button>&nbsp;&nbsp;<button class="btn btn-primary" onclick="Delete(` + prod.productid + `)">Delete</button></td></tr>>`
                 );
             });
         });
     }
 
-    function Edit(pid) {
-        $.getJSON("/Home/Edit", { pid: pid }, function (data) {
+    function Edit(productid) {
+        $.getJSON("/Home/Edit", { productid: productid }, function (data) {
             prod = JSON.parse(data);
             $("#productid").val(prod.productid);
             $("#catid").val(prod.catid);
@@ -158,8 +158,8 @@
         });
     }
 
-    function Delete(pid) {
-        $.post("Home/Delete", { pid: pid }, function () {
+    function Delete(productid) {
+        $.post("Home/Delete", { productid: productid }, function () {
             alert("Data Deleted");
             GetAllProducts();
         });

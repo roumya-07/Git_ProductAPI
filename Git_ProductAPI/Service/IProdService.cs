@@ -13,6 +13,6 @@ namespace Git_ProductAPI.Service
         public Task<List<SubCategory>> GetAllSubCategory(int catid);
         public Task<Product> GetProductById(int pid);
         public Task<int> Insert(Product pr);
-        public Task<int> Delete(int pid);
+        public Task<int> Delete(int productid);
     }
 }

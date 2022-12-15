@@ -29,7 +29,7 @@ namespace Git_ProductAPI.Repository
             if (cn.State == ConnectionState.Closed) cn.Open();
             DynamicParameters param = new DynamicParameters();
             param.Add("@productid", pid);
-            param.Add("@mode", "select");
+            param.Add("@mode", "SelectOne");
             var lstprod = cn.Query<Product>("sp_ProductCatsubcatFile", param, commandType: CommandType.StoredProcedure).FirstOrDefault();
             cn.Close();
             return lstprod;
@@ -41,21 +41,23 @@ namespace Git_ProductAPI.Repository
             DynamicParameters param = new DynamicParameters();
             param.Add("@productid", pr.productid);
             param.Add("@productname", pr.productname);
+            param.Add("@productdesc", pr.productdesc);
             param.Add("@catid", pr.catid);
             param.Add("@subcatid", pr.subcatid);
             param.Add("@productprice", pr.productprice);
             param.Add("@productqty", pr.productqty);
+            param.Add("@productimage", pr.productimage);
             param.Add("@mode", "insUp");
             int x = cn.Execute("sp_ProductCatsubcatFile", param, commandType: CommandType.StoredProcedure);
             cn.Close();
             return x;
         }
-        public async Task<int> Delete(int pid)
+        public async Task<int> Delete(int productid)
         {
             var cn = CreateConnection();
             if (cn.State == ConnectionState.Closed) cn.Open();
             DynamicParameters param = new DynamicParameters();
-            param.Add("@pid", pid);
+            param.Add("@productid", productid);
             param.Add("@mode", "delete");
             int x = cn.Execute("sp_ProductCatsubcatFile", param, commandType: CommandType.StoredProcedure);
             cn.Close();
