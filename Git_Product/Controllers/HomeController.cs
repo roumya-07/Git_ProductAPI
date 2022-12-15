@@ -1,4 +1,6 @@
 ﻿using Git_Product.Models;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Logging;
@@ -6,6 +8,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
@@ -15,11 +18,13 @@ namespace Git_Product.Controllers
 {
     public class HomeController : Controller
     {
+        private readonly IWebHostEnvironment _environment;
         Uri baseAdd = new Uri("http://localhost:41000/api");
 
         HttpClient client;
-        public HomeController()
+        public HomeController(IWebHostEnvironment environment)
         {
+            _environment = environment;
             client = new HttpClient();
             client.BaseAddress = baseAdd;
         }
@@ -37,15 +42,33 @@ namespace Git_Product.Controllers
             return View();
         }
 
+        //[HttpPost]
+        //public async Task<IActionResult> Create(Product prod)
+        //{
+        //    string data = JsonConvert.SerializeObject(prod);
+        //    StringContent content = new StringContent(data, Encoding.UTF8, "application/json");
+        //    HttpResponseMessage response = client.PutAsync(client.BaseAddress + "/Product/" + prod.productid, content).Result;
+        //    if (response.IsSuccessStatusCode)
+        //    {
+        //        return RedirectToAction("Index");
+        //    }
+        //    return View();
+        //}
         [HttpPost]
-        public async Task<IActionResult> Create(Product prod)
+        public IActionResult SaveUpdate(int pid, Product prd)
         {
-            string data = JsonConvert.SerializeObject(prod);
+            string[] files = prd.productimage.Split('\\');
+            prd.productimage = "prodimage/" + files[files.Length - 1];
+            string data = JsonConvert.SerializeObject(prd);
+            HttpResponseMessage response;
             StringContent content = new StringContent(data, Encoding.UTF8, "application/json");
-            HttpResponseMessage response = client.PutAsync(client.BaseAddress + "/Product/" + prod.productid, content).Result;
+
+            response = client.PutAsync(client.BaseAddress + "/Product/" + prd.productid, content).Result;
+
             if (response.IsSuccessStatusCode)
             {
                 return RedirectToAction("Index");
+
             }
             return View();
         }
@@ -75,6 +98,22 @@ namespace Git_Product.Controllers
             }
             var jsonres = JsonConvert.SerializeObject(scalist);
             return Json(jsonres);
+        }
+        [HttpPost]
+        public IActionResult UploadImage(IFormFile MyUploader)
+        {
+            if (MyUploader != null)
+            {
+                string uploadsFolder = Path.Combine(_environment.WebRootPath, "prodimage");
+                string filePath = Path.Combine(uploadsFolder, MyUploader.FileName);
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    MyUploader.CopyTo(fileStream);
+                }
+                return new ObjectResult(new { status = "success" });
+            }
+            return new ObjectResult(new { status = "fail" });
+
         }
         public async Task<JsonResult> Edit(int productid)
         {
